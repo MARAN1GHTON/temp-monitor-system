@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Настройки</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header>
+        <a href="/map">Назад</a>
+        <h1>Настройки</h1>
+    </header>
+    <div class="settings-container">
+        <p>Текущие настройки системы:</p>
+        <ul>
+            <li>Мин. температура: {{ settings.min_temp }}°C</li>
+            <li>Макс. температура: {{ settings.max_temp }}°C</li>
+        </ul>
+        <button class="btn-green">Сохранить изменения</button>
+    </div>
+</body>
+</html>
