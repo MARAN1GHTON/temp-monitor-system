@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Карта городских объектов</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        /* Простая имитация карты для примера */
+        .map-placeholder {
+            background-color: #e0e0e0;
+            height: 300px;
+            position: relative;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .map-marker {
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            position: absolute;
+            border: 2px solid white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <button onclick="history.back()">Back</button>
+        <h1>Карта городских объектов</h1>
+        <a href="/settings">Настройки</a>
+    </header>
+
+    <div class="map-placeholder" id="map">
+        </div>
+
+    <div class="objects-list" id="objects-list">
+        </div>
+
+    <script>
+        // Функция опроса сервера (Polling)
+        async function loadData() {
+            try {
+                // Запрос к нашему Python API
+                let response = await fetch('/api/objects');
+                let objects = await response.json();
+
+                const listContainer = document.getElementById('objects-list');
+                const mapContainer = document.getElementById('map');
+                
+                listContainer.innerHTML = ''; // Очищаем список
+                mapContainer.innerHTML = '';  // Очищаем карту
+
+                objects.forEach((obj, index) => {
+                    // 1. Создаем карточку в списке
+                    let card = document.createElement('div');
+                    card.className = 'object-card';
+                    card.innerHTML = `
+                        <h3>${obj.name}</h3>
+                        <div class="status-indicator ${obj.color}"></div>
+                        <p>Температура: <b>${obj.temp}°C</b></p>
+                        <p>Статус: ${obj.status}</p>
+                    `;
+                    listContainer.appendChild(card);
+
+                    // 2. Создаем маркер на "карте" (случайные координаты для примера)
+                    let marker = document.createElement('div');
+                    marker.className = 'map-marker';
+                    marker.style.backgroundColor = obj.color;
+                    marker.style.top = (20 + index * 15) + '%'; 
+                    marker.style.left = (10 + index * 20) + '%';
+                    mapContainer.appendChild(marker);
+                });
+
+            } catch (error) {
+                console.error("Ошибка загрузки данных:", error);
+            }
+        }
+
+        // Загружаем данные при открытии страницы
+        loadData();
+    </script>
+</body>
+</html>
