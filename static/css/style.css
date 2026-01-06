@@ -1,0 +1,11 @@
+body { font-family: sans-serif; margin: 0; background-color: #f0f2f5; }
+header { background-color: #4A69E0; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+h1, h2 { margin: 0; }
+a { color: white; text-decoration: none; }
+.login-container { text-align: center; margin-top: 100px; }
+.objects-list { padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; }
+.object-card { background: white; padding: 15px; border-radius: 10px; width: 45%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.status-indicator { width: 15px; height: 15px; border-radius: 50%; display: inline-block; }
+.red { background-color: red; }
+.green { background-color: #00FF00; }
+.btn-green { background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; width: 100%; margin-top: 20px;}
