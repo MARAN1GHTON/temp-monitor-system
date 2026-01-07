@@ -3,78 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <title>Карта городских объектов</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="/static/css/style.css">
     <style>
-        /* Простая имитация карты для примера */
-        .map-placeholder {
-            background-color: #e0e0e0;
-            height: 300px;
-            position: relative;
-            margin-bottom: 20px;
+        /* Карта теперь будет во весь блок */
+        #map {
+            height: 400px;
+            width: 100%;
             border-radius: 8px;
-        }
-        .map-marker {
-            width: 20px; height: 20px;
-            border-radius: 50%;
-            position: absolute;
-            border: 2px solid white;
+            margin-bottom: 20px;
+            z-index: 1;
         }
     </style>
 </head>
 <body>
     <header>
-        <button onclick="history.back()">Back</button>
-        <h1>Карта городских объектов</h1>
+        <button onclick="history.back()" style="background:none; border:none; color:white; cursor:pointer;">Назад</button>
+        <h1>Карта города</h1>
         <a href="/settings">Настройки</a>
     </header>
 
-    <div class="map-placeholder" id="map">
-        </div>
+    <div id="map"></div>
 
-    <div class="objects-list" id="objects-list">
-        </div>
+    <div class="objects-list" id="objects-list"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        // Функция опроса сервера (Polling)
+        // Инициализация карты (центр - Москва для примера, или твои координаты из БД)
+        var map = L.map('map').setView([55.75, 37.61], 12);
+
+        // Добавляем слой карты OpenStreetMap (Интеграция!)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
         async function loadData() {
             try {
-                // Запрос к нашему Python API
                 let response = await fetch('/api/objects');
                 let objects = await response.json();
 
                 const listContainer = document.getElementById('objects-list');
-                const mapContainer = document.getElementById('map');
-                
-                listContainer.innerHTML = ''; // Очищаем список
-                mapContainer.innerHTML = '';  // Очищаем карту
+                listContainer.innerHTML = '';
 
-                objects.forEach((obj, index) => {
-                    // 1. Создаем карточку в списке
+                objects.forEach(obj => {
+                    // 1. Добавляем карточку в список
                     let card = document.createElement('div');
                     card.className = 'object-card';
                     card.innerHTML = `
                         <h3>${obj.name}</h3>
                         <div class="status-indicator ${obj.color}"></div>
-                        <p>Температура: <b>${obj.temp}°C</b></p>
-                        <p>Статус: ${obj.status}</p>
+                        <p>T: <b>${obj.temp}°C</b> | ${obj.status}</p>
                     `;
                     listContainer.appendChild(card);
 
-                    // 2. Создаем маркер на "карте" (случайные координаты для примера)
-                    let marker = document.createElement('div');
-                    marker.className = 'map-marker';
-                    marker.style.backgroundColor = obj.color;
-                    marker.style.top = (20 + index * 15) + '%'; 
-                    marker.style.left = (10 + index * 20) + '%';
-                    mapContainer.appendChild(marker);
+                    // 2. Добавляем маркер на карту
+                    // Используем координаты из базы данных
+                    if (obj.latitude && obj.longitude) {
+                        var markerColor = obj.color === 'red' ? 'red' : 'green';
+                        
+                        // Простой кружочек вместо стандартного маркера
+                        L.circleMarker([obj.latitude, obj.longitude], {
+                            color: markerColor,
+                            fillColor: markerColor,
+                            fillOpacity: 0.8,
+                            radius: 10
+                        }).addTo(map)
+                        .bindPopup(`<b>${obj.name}</b><br>Температура: ${obj.temp}°C`);
+                    }
                 });
 
             } catch (error) {
-                console.error("Ошибка загрузки данных:", error);
+                console.error("Ошибка:", error);
             }
         }
 
-        // Загружаем данные при открытии страницы
         loadData();
     </script>
 </body>
